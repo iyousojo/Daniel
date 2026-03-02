@@ -1,0 +1,18 @@
+.c-item{
+ height: 90vh;
+}
+.c-img{
+    height: 100%;
+    object-fit: cover;
+    filter: brightness(0.4);
+}
+.card:hover{
+    border: 1px solid #000;
+}
+h6{
+    color: #000;
+    font-weight: bold;
+}
+.card-title{
+    text-align: center;
+}

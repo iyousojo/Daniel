@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>payment_successful</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="payment.css">
+    <style>
+        .bi-check-circle-fill { font-size: 4rem; color: #198754; }
+        #loader { display: block; }
+        #success-content { display: none; }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Academic Digital Resources</a>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <!-- Verification Loader -->
+        <div id="loader" class="text-center">
+            <div class="spinner-border text-primary" role="status"></div>
+            <p class="mt-2">Verifying your transaction, please wait...</p>
+        </div>
+
+        <!-- Success Content -->
+        <div class="payment_successful mb-4 text-center" id="success-content">
+            <h2 class="mt-5 text-center fw-bold">Payment Successful</h2>
+            <i class="bi bi-check-circle-fill"></i>
+            <div class="text-center">
+                <p class="mb-4">Thank you for your payment. Your transaction has been completed successfully.</p>
+                <p id="ref-display" class="text-muted small"></p>
+                <a href="index.html"><button class="btn btn-primary">Go to My Books</button></a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+       async function verifyPayment() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference');
+    // Get the token from localStorage
+    const token = localStorage.getItem('token'); 
+
+    if (!reference) {
+        console.error("No reference found");
+        window.location.href = "payment_failure.html";
+        return;
+    }
+
+    try {
+        // Send the token in the headers!
+        const response = await fetch(`https://bookshop-api-jbl4.onrender.com/api/payments/verify/${reference}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Hide loader and show success content
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('success-content').style.display = 'block';
+            document.getElementById('ref-display').innerText = "Ref: " + reference;
+            
+            // Optional: You could also save the purchase status to local storage here
+            console.log("Verification Data:", data);
+        } else {
+            console.error("Server rejected verification:", data.error);
+            window.location.href = "payment_failure.html";
+        }
+    } catch (error) {
+        console.error("Network/Verification error:", error);
+        window.location.href = "payment_failure.html";
+    }
+}
+
+// Run verification on page load
+window.onload = verifyPayment;async function verifyPayment() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const reference = urlParams.get('reference');
+    // Get the token from localStorage
+    const token = localStorage.getItem('token'); 
+
+    if (!reference) {
+        console.error("No reference found");
+        window.location.href = "payment_failure.html";
+        return;
+    }
+
+    try {
+        // Send the token in the headers!
+        const response = await fetch(`https://bookshop-api-jbl4.onrender.com/api/payments/verify/${reference}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Hide loader and show success content
+            document.getElementById('loader').style.display = 'none';
+            document.getElementById('success-content').style.display = 'block';
+            document.getElementById('ref-display').innerText = "Ref: " + reference;
+            
+            // Optional: You could also save the purchase status to local storage here
+            console.log("Verification Data:", data);
+        } else {
+            console.error("Server rejected verification:", data.error);
+            window.location.href = "payment_failure.html";
+        }
+    } catch (error) {
+        console.error("Network/Verification error:", error);
+        window.location.href = "payment_failure.html";
+    }
+}
+
+// Run verification on page load
+window.onload = verifyPayment;
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

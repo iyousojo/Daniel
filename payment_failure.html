@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>payment_failure</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="payment_failure.css">
+    <style>
+        /* Ensuring the failure icon is red to match the status */
+        .bi-x-circle-fill { 
+            font-size: 5rem; 
+            color: #dc3545; 
+            display: block;
+            margin-top: 2rem;
+        }
+        .payment_successful {
+            padding: 20px;
+        }
+        .btn {
+            background-color: #dc3545;
+            color: white;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background-color: #a71d2a;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top shadow-sm">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Academic Digital Resources</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarTogglerDemo02" aria-controls="navbarTogglerDemo02" aria-expanded="false"
+                aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="payment_successful mb-4 text-center" id="failure-container">
+        <i class="bi bi-x-circle-fill"></i>
+        <h2 class="text-center fw-bold mt-3">Payment Failure</h2>
+        <div class="text-center">
+            <p class="mb-2">Your payment was not successful. Please try again.</p>
+            <!-- This small text will show the specific reason if provided -->
+            <p id="error-reason" class="text-muted small mb-4"></p> 
+            
+            <a href="index.html"><button class="btn border-0">Return to Dashboard</button></a>
+        </div>
+    </div>
+
+    <script>
+        // Check if there is an error message in the URL (e.g., ?message=Declined)
+        const urlParams = new URLSearchParams(window.location.search);
+        const reason = urlParams.get('message');
+        if (reason) {
+            document.getElementById('error-reason').innerText = "Reason: " + reason;
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

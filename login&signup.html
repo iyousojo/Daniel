@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Auth</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f0f2f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .auth-card { width: 100%; max-width: 450px; border: none; border-radius: 20px; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); background: #fff; }
+        .nav-pills .nav-link { color: #6c757d; font-weight: 600; border-radius: 10px; margin: 0 5px; }
+        .nav-pills .nav-link.active, .btn-primary { background-color: #0d6efd !important; border-color: #0d6efd !important; }
+        .form-label { font-weight: 500; font-size: 0.9rem; }
+        .form-control, .form-select { padding: 10px 15px; border-radius: 8px; }
+        #response-message { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card auth-card p-4">
+    <div id="response-message" class="alert text-center mb-3" role="alert"></div>
+
+    <ul class="nav nav-pills nav-justified mb-4" id="pills-tab" role="tablist">
+        <li class="nav-item">
+            <button class="nav-link active" id="tab-login" data-bs-toggle="pill" data-bs-target="#pills-login" type="button">Login</button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" id="tab-signup" data-bs-toggle="pill" data-bs-target="#pills-signup" type="button">Register</button>
+        </li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="pills-login">
+            <h4 class="text-center mb-4 fw-bold text-primary">Student Login</h4>
+            <form id="loginForm" class="needs-validation" novalidate>
+                <div class="mb-3">
+                    <label class="form-label">Student ID</label>
+                    <input type="text" class="form-control" id="loginId" placeholder="EXXXXXX" required pattern="^E.*$">
+                    <div class="invalid-feedback">Student ID must start with 'E'</div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="loginPass" required>
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary py-2 fw-bold">Login to Portal</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="tab-pane fade" id="pills-signup">
+            <h4 class="text-center mb-4 fw-bold text-primary">New Registration</h4>
+            <form id="signupForm" class="needs-validation" novalidate>
+                <div class="row g-2 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Student ID</label>
+                        <input type="text" class="form-control" id="regId" placeholder="EXXXXXX" required pattern="^E.*$">
+                        <div class="invalid-feedback">Must start with 'E'</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Matric No.</label>
+                        <input type="text" class="form-control" id="regMatric" placeholder="FPS/CSC/..." required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Current Level</label>
+                    <select class="form-select" id="regLevel" required>
+                        <option value="" selected disabled>Choose level...</option>
+                        <option value="100">100 Level</option>
+                        <option value="200">200 Level</option>
+                        <option value="300">300 Level</option>
+                        <option value="400">400 Level</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="regName" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-control" id="regPass" required minlength="6">
+                </div>
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-primary py-2 fw-bold">Complete Registration</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+const alertBox = document.getElementById('response-message');
+const forms = document.querySelectorAll('.needs-validation');
+const API_URL = "https://bookshop-api-jbl4.onrender.com/api";
+
+// Pre-check: If already logged in, redirect away from auth page
+document.addEventListener('DOMContentLoaded', () => {
+    const user = JSON.parse(localStorage.getItem('user'));
+    if (user) {
+        window.location.href = (user.role === 'admin') ? "admin/dashboard.html" : "index.html";
+    }
+});
+
+forms.forEach(form => {
+    form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return;
+        }
+
+        const btn = form.querySelector('button');
+        const originalText = btn.innerText;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Processing...`;
+        alertBox.style.display = 'none';
+
+        let payload = {};
+        let endpoint = (form.id === 'loginForm') ? "/auth/login" : "/auth/register";
+
+        if (form.id === 'loginForm') {
+            payload = {
+                StudentID: document.getElementById('loginId').value,
+                password: document.getElementById('loginPass').value
+            };
+        } else {
+            payload = {
+                StudentID: document.getElementById('regId').value,
+                matricNo: document.getElementById('regMatric').value,
+                level: document.getElementById('regLevel').value,
+                fullname: document.getElementById('regName').value,
+                password: document.getElementById('regPass').value
+            };
+        }
+
+        try {
+            const response = await fetch(`${API_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const contentType = response.headers.get("content-type");
+            let data = {};
+            
+            if (contentType && contentType.includes("application/json")) {
+                data = await response.json();
+            } else {
+                const text = await response.text();
+                if (text.includes("<!DOCTYPE html>")) throw new Error("Server is waking up. Please try again.");
+                throw new Error(text || `Error ${response.status}`);
+            }
+
+            if (!response.ok) {
+                throw new Error(data.error || data.message || "Authentication failed.");
+            }
+
+            alertBox.className = "alert alert-success text-center mb-3";
+            alertBox.style.display = 'block';
+
+            if (form.id === 'loginForm') {
+                alertBox.innerText = "Login Successful! Redirecting...";
+                localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                
+                setTimeout(() => {
+                    // Role-based redirection logic
+                    if (data.user?.role === 'admin') {
+                        window.location.href = "admin/dashboard.html";
+                    } else {
+                        window.location.href = "index.html";
+                    }
+                }, 1500);
+            } else {
+                alertBox.innerText = "Registration Successful! Switching to Login...";
+                form.reset();
+                form.classList.remove('was-validated');
+                
+                setTimeout(() => {
+                    const loginTab = new bootstrap.Tab(document.querySelector('#tab-login'));
+                    loginTab.show();
+                    alertBox.style.display = 'none';
+                }, 2500);
+            }
+
+        } catch (error) {
+            alertBox.className = "alert alert-danger text-center mb-3";
+            alertBox.style.display = 'block';
+            alertBox.innerText = error.message;
+        } finally {
+            btn.disabled = false;
+            btn.innerText = originalText;
+        }
+    });
+});
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+/* Add this to your style.css */
+html {
+    scroll-behavior: smooth;
+}
+
+/* This prevents the sticky navbar from covering the title of the section you jump to */
+section[id] {
+    scroll-margin-top: 70px; 
+}
+.home {
+    width: 100%;
+    height: 100vh;
+    background: url(home2.webp);
+    background-size: cover;
+    display: grid;
+    justify-content: center;
+    align-content: center; /* Ensures the grid content stays grouped in the middle */
+    text-align: center;
+    color: black;
+}
+
+.home h1 {
+    font-size: 50px;
+    margin-bottom: 10px; /* Small gap between title and the box */
+}
+
+.home2 {
+    background-color: rgba(255, 255, 255, 0.7);
+    border-radius: 10px;
+    padding: 15px; /* Adds space inside the box, but keeps text close together */
+    width: 50%; /* Adjust width as needed */
+    margin: 0 auto; /* Centers the box horizontally */
+    justify-content: center;
+    text-align: center;
+    align-content: center;
+}
+
+.home2 .btn-container {
+    margin: 0 0 15px 0; /* Removes top margin, keeps a small bottom margin for the button */
+    padding: 5px 10px;
+    
+}
+.about-section {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    display: grid;
+}
+.service {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: #ffffff;
+    display: grid;
+}
+.contact-from {
+    padding: 50px 20px;
+    text-align: center;
+    background-color: #f9f9f9;
+    display: grid;
+}

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Access Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .auth-card {
+            width: 100%;
+            max-width: 400px;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+        .admin-header {
+            background: #0d6efd;
+            margin: -24px -24px 24px -24px;
+            padding: 30px;
+            border-radius: 20px 20px 0 0;
+            color: white;
+            text-align: center;
+        }
+        .form-label {
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #495057;
+        }
+        .form-control {
+            padding: 12px;
+            border-radius: 10px;
+        }
+        .btn-primary {
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        #response-message { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card auth-card p-4">
+    <div class="admin-header">
+        <h4 class="mb-0 fw-bold">Admin Portal</h4>
+        <small class="opacity-75">Secure Access Control</small>
+    </div>
+
+    <div id="response-message" class="alert text-center mb-4" role="alert"></div>
+
+    <form id="adminLoginForm" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label class="form-label">Administrator ID</label>
+            <input type="text" class="form-control" id="adminId" placeholder="Enter Admin ID" required>
+            <div class="invalid-feedback">Admin ID is required.</div>
+        </div>
+        
+        <div class="mb-4">
+            <label class="form-label">Secure Password</label>
+            <input type="password" class="form-control" id="adminPass" placeholder="••••••••" required>
+            <div class="invalid-feedback">Please enter your password.</div>
+        </div>
+
+        <div class="d-grid">
+            <button type="submit" class="btn btn-primary" id="loginBtn">
+                <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                <span class="btn-text">Authorize Access</span>
+            </button>
+        </div>
+        
+        <div class="text-center mt-4">
+            <a href="../index.html" class="text-decoration-none small text-muted">← Return to Main Site</a>
+        </div>
+    </form>
+</div>
+
+<script>
+    const loginForm = document.getElementById('adminLoginForm');
+    const alertBox = document.getElementById('response-message');
+    const API_URL = "https://bookshop-api-jbl4.onrender.com/api";
+
+    loginForm.addEventListener('submit', async function (event) {
+        event.preventDefault();
+        
+        if (!loginForm.checkValidity()) {
+            event.stopPropagation();
+            loginForm.classList.add('was-validated');
+            return;
+        }
+
+        const btn = document.getElementById('loginBtn');
+        const spinner = btn.querySelector('.spinner-border');
+        const btnText = btn.querySelector('.btn-text');
+
+        // 1. Loading State
+        btn.disabled = true;
+        spinner.classList.remove('d-none');
+        btnText.innerText = ' Verifying...';
+        alertBox.style.display = 'none';
+
+        const payload = {
+            StudentID: document.getElementById('adminId').value, // API uses StudentID for login field
+            password: document.getElementById('adminPass').value
+        };
+
+        try {
+            const response = await fetch(`${API_URL}/auth/login`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.message || "Unauthorized access.");
+            }
+
+            // Verify if user is actually an admin
+            if (data.user.role !== 'admin') {
+                throw new Error("Access Denied: Administrative privileges required.");
+            }
+
+            // 2. Success State
+            alertBox.className = "alert alert-success text-center mb-4";
+            alertBox.style.display = 'block';
+            alertBox.innerText = "Verification Successful! Redirecting...";
+            
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('user', JSON.stringify(data.user));
+
+            setTimeout(() => {
+                window.location.href = "dashboard.html";
+            }, 1500);
+
+        } catch (error) {
+            // 3. Error State
+            alertBox.className = "alert alert-danger text-center mb-4";
+            alertBox.style.display = 'block';
+            alertBox.innerText = error.message;
+            
+            btn.disabled = false;
+            spinner.classList.add('d-none');
+            btnText.innerText = 'Authorize Access';
+        }
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
