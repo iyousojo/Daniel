@@ -94,9 +94,139 @@
             </div>
         </div>
 
-        <footer class="bg-primary text-white py-4 mt-5">
-            <div class="container text-center">
-                <p class="mb-0">© 2026 Academic Digital Resources. Empowering Students Worldwide.</p>
+       <!-- SERVICES SECTION -->
+        <div class="services py-5 bg-white" id="Service">
+            <div class="container">
+                <h2 class="text-center fw-bolder mb-5 text-primary">Our Services</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm p-4 text-center transition-hover">
+                            <div class="mb-3">
+                                <i class="bi bi-book-half text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="fw-bold">Digital Library</h4>
+                            <p class="text-muted">Access a wide range of academic textbooks and journals from any device, anywhere in the world.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm p-4 text-center transition-hover">
+                            <div class="mb-3">
+                                <i class="bi bi-cloud-arrow-down text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="fw-bold">Offline Access</h4>
+                            <p class="text-muted">Purchase and download resources to your personal dashboard for offline reading during study sessions.</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm p-4 text-center transition-hover">
+                            <div class="mb-3">
+                                <i class="bi bi-shield-check text-primary" style="font-size: 2.5rem;"></i>
+                            </div>
+                            <h4 class="fw-bold">Verified Content</h4>
+                            <p class="text-muted">All our materials are vetted by academic professionals to ensure you get the most accurate information.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FEATURED BOOKS SECTION (Moved inside a container for better spacing) -->
+        <div class="featured-books bg-light py-5">
+            <div class="container">
+                <div class="d-flex justify-content-between align-items-center mb-5">
+                    <h2 class="fw-bolder text-primary mb-0">Featured Resources</h2>
+                    <a href="book.html" class="btn btn-outline-primary fw-bold">View All Books</a>
+                </div>
+                <div id="book-list-container" class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+                    <!-- Dynamic Books Load Here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTACT US SECTION -->
+        <div class="contact py-5 bg-white" id="contactus">
+            <div class="container">
+                <h2 class="text-center fw-bolder mb-5 text-primary">Contact Us</h2>
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <div class="bg-primary text-white p-5 rounded shadow-lg h-100">
+                            <h3 class="fw-bold mb-4">Get in Touch</h3>
+                            <p class="mb-4">Have questions about a book or need technical support? Our team is here to help you.</p>
+                            <div class="d-flex mb-3">
+                                <i class="bi bi-geo-alt-fill me-3"></i>
+                                <p>123 University Way, Academic City, NG</p>
+                            </div>
+                            <div class="d-flex mb-3">
+                                <i class="bi bi-envelope-fill me-3"></i>
+                                <p>support@adr-library.com</p>
+                            </div>
+                            <div class="d-flex">
+                                <i class="bi bi-telephone-fill me-3"></i>
+                                <p>+234 800 123 4567</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-7">
+                        <div class="card border-0 shadow-sm p-4">
+                            <form id="contactForm">
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Your Name</label>
+                                        <input type="text" class="form-control" placeholder="John Doe" required>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Email Address</label>
+                                        <input type="email" class="form-control" placeholder="john@example.com" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Subject</label>
+                                        <input type="text" class="form-control" placeholder="How can we help?" required>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label fw-bold">Message</label>
+                                        <textarea class="form-control" rows="5" placeholder="Write your message here..." required></textarea>
+                                    </div>
+                                    <div class="col-12">
+                                        <button type="submit" class="btn btn-primary px-5 py-2 fw-bold">Send Message</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FOOTER UPDATE -->
+        <footer class="bg-dark text-white py-5 mt-5">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <h5 class="fw-bold text-primary mb-3">ADR Library</h5>
+                        <p class="small text-secondary">Providing high-quality digital academic resources to students and researchers globally.</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="fw-bold mb-3">Quick Links</h5>
+                        <ul class="list-unstyled small">
+                            <li><a href="index.html" class="text-secondary text-decoration-none">Home</a></li>
+                            <li><a href="book.html" class="text-secondary text-decoration-none">Browse Books</a></li>
+                            <li><a href="#about" class="text-secondary text-decoration-none">About Us</a></li>
+                            <li><a href="login&signup.html" class="text-secondary text-decoration-none">Student Login</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-md-4">
+                        <h5 class="fw-bold mb-3">Follow Us</h5>
+                        <div class="d-flex gap-3">
+                            <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-twitter-x"></i></a>
+                            <a href="#" class="btn btn-outline-light btn-sm"><i class="bi bi-instagram"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <hr class="my-4 border-secondary">
+                <div class="text-center small text-secondary">
+                    <p>© 2026 Academic Digital Resources. All rights reserved.</p>
+                </div>
             </div>
         </footer>
     </div>
