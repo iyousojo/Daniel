@@ -80,28 +80,38 @@
     </footer>
 
    <script>
-    const API_URL = "https://bookshop-api-jbl4.onrender.com/api";
+    // 1. Updated API URL to match your working admin dashboard
+    const API_URL = "https://bookshop-api-jbl4.onrender.com/api/books"; 
     let allBooks = [];
 
     document.addEventListener('DOMContentLoaded', fetchAllBooks);
 
     async function fetchAllBooks() {
         try {
-            const response = await fetch(`${API_URL}/books`);
-            if (!response.ok) throw new Error("Server response was not ok");
-            allBooks = await response.json();
+            // Check if your route is /all or just /
+            const response = await fetch(`${API_URL}/all`); 
+            
+            if (!response.ok) {
+                // If /all doesn't work, try the base URL
+                const backupResponse = await fetch(`${API_URL}`);
+                if (!backupResponse.ok) throw new Error("Server response was not ok");
+                allBooks = await backupResponse.json();
+            } else {
+                allBooks = await response.json();
+            }
+
+            console.log("Books fetched:", allBooks); // Debugging line
             renderBooks(allBooks);
         } catch (error) {
             console.error("Error:", error);
-            // Show error in containers instead of just an alert
             document.querySelectorAll('[id^="container-"]').forEach(el => {
-                el.innerHTML = '<div class="text-danger text-center">Failed to load books. Please refresh.</div>';
+                el.innerHTML = '<div class="text-danger text-center py-3">Failed to load books. Please refresh.</div>';
             });
         }
     }
 
     function renderBooks(booksToDisplay) {
-        // FIX: The keys here MUST match the values from your database (e.g., "100L")
+        // These keys must match exactly what is in your DB (e.g., "100L", "200L")
         const containers = {
             "100L": document.getElementById('container-100'),
             "200L": document.getElementById('container-200'),
@@ -109,8 +119,17 @@
             "400L": document.getElementById('container-400')
         };
 
-        // Clear all containers
-        Object.values(containers).forEach(div => { if(div) div.innerHTML = ''; });
+        // Clear all containers before rendering (important for search)
+        Object.values(containers).forEach(div => { 
+            if (div) div.innerHTML = ''; 
+        });
+
+        if (booksToDisplay.length === 0) {
+            Object.values(containers).forEach(div => {
+                if (div) div.innerHTML = '<div class="col-12 text-center text-muted">No books match your search.</div>';
+            });
+            return;
+        }
 
         booksToDisplay.forEach(book => {
             const cardHTML = `
@@ -131,21 +150,21 @@
                 </div>
             `;
 
-            // This level variable will be "100L", "200L", etc.
-            const level = String(book.level);
-            
-            // Now this check will succeed because containers["100L"] exists
+            // Ensure we handle levels like "100" or "100L" correctly
+            let level = String(book.level).toUpperCase();
+            if (!level.endsWith('L')) level += 'L'; 
+
             if (containers[level]) {
                 containers[level].innerHTML += cardHTML;
             }
         });
 
-        // Show empty state for sections with no matching books
+        // Add "Empty" message to sections that have no books
         Object.keys(containers).forEach(key => {
             if (containers[key] && containers[key].innerHTML === '') {
                 containers[key].innerHTML = `
                     <div class="col-12">
-                        <div class="alert alert-secondary text-center">No books available for ${key} yet.</div>
+                        <div class="alert alert-light text-center border-0 small">No books currently available for ${key}.</div>
                     </div>`;
             }
         });
@@ -159,5 +178,6 @@
         );
         renderBooks(filtered);
     }
+
 </script>
 </html>
