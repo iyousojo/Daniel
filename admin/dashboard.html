@@ -16,6 +16,11 @@
         .stats-card { border: none; border-left: 5px solid #0d6efd; transition: 0.3s; }
         .stats-card:hover { transform: translateY(-5px); }
         .nav-link.active { font-weight: bold; color: #0d6efd !important; }
+        
+        /* Dropdown Custom Styling */
+        .dropdown-menu { border-radius: 10px; margin-top: 10px; border: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .dropdown-item { padding: 10px 20px; transition: 0.2s; }
+        .dropdown-item:hover { background-color: #f8f9fa; color: #0d6efd; padding-left: 25px; }
     </style>
 </head>
 
@@ -31,8 +36,22 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="dashboard.html"><i class="bi bi-speedometer2"></i> Home</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="form_book.html"><i class="bi bi-plus-circle"></i> Add Book</a>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="bookDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-book"></i> Books
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="bookDropdown">
+                            <li>
+                                <a class="dropdown-item" href="form_book.html">
+                                    <i class="bi bi-plus-circle me-2 text-primary"></i> Add New Book
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="manage_books.html">
+                                    <i class="bi bi-pencil-square me-2 text-success"></i> Manage Inventory
+                                </a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
                 <div class="d-flex align-items-center">
@@ -128,12 +147,8 @@
             
             if (!Array.isArray(payments)) return;
 
-            // ROBUST GROUPING LOGIC
             groupedData = payments.reduce((acc, curr) => {
-                // Skip if data is broken
                 if (!curr.user || !curr.book) return acc;
-
-                // Use the MongoDB _id as a fallback if StudentID is missing
                 const studentKey = curr.user._id; 
                 
                 if (!acc[studentKey]) {

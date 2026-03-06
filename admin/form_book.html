@@ -70,88 +70,119 @@
         </div>
     </div>
 <script>
-    const API_URL = "https://bookshop-api-jbl4.onrender.com/api";
+   const API_URL = "https://bookshop-api-jbl4.onrender.com/api/books"; // Ensure this matches your route prefix
+const urlParams = new URLSearchParams(window.location.search);
+const editId = urlParams.get('edit'); // Detects ?edit=ID
 
-    // FIX FOR PREVIEW ERROR
-    function previewFile() {
-        const preview = document.getElementById('imagePreview');
-        const fileInput = document.getElementById('image');
+document.addEventListener('DOMContentLoaded', async () => {
+    // If we are in EDIT mode
+    if (editId) {
+        document.querySelector('h2').innerHTML = '<i class="bi bi-pencil-square"></i> Edit Book Details';
+        document.getElementById('btnText').innerText = "Update Book Details";
+        document.getElementById('image').required = false; // Image not required when editing
         
-        // FIX 1: Add here
-        const selectedFile = fileInput.files[0]; 
+        await prefillFormData(editId);
+    }
+});
 
-        if (selectedFile) {
-            const reader = new FileReader();
+// 1. FETCH AND FILL DATA
+async function prefillFormData(id) {
+    try {
+        const response = await fetch(`${API_URL}/${id}`);
+        const book = await response.json();
 
-            reader.onloadend = () => {
-                preview.src = reader.result;
+        if (response.ok) {
+            document.getElementById('title').value = book.title;
+            document.getElementById('author').value = book.author;
+            document.getElementById('price').value = book.price;
+            document.getElementById('level').value = book.level;
+            
+            // Show current image preview
+            if (book.imageUrl) {
+                const preview = document.getElementById('imagePreview');
+                preview.src = book.imageUrl;
                 preview.style.display = 'block';
             }
-            
-            // This now receives the 'Blob' it was asking for
-            reader.readAsDataURL(selectedFile); 
         }
+    } catch (err) {
+        console.error("Error prefilling form:", err);
+    }
+}
+
+// 2. PREVIEW FILE LOGIC
+function previewFile() {
+    const preview = document.getElementById('imagePreview');
+    const fileInput = document.getElementById('image');
+    const selectedFile = fileInput.files[0];
+
+    if (selectedFile) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            preview.src = reader.result;
+            preview.style.display = 'block';
+        }
+        reader.readAsDataURL(selectedFile);
+    }
+}
+
+// 3. SUBMIT LOGIC (HANDLES BOTH ADD & EDIT)
+document.getElementById('addBookForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const token = localStorage.getItem('token');
+    const btn = document.getElementById('submitBtn');
+    const spinner = document.getElementById('btnSpinner');
+    const btnText = document.getElementById('btnText');
+    const fileInput = document.getElementById('image');
+
+    btn.disabled = true;
+    spinner.classList.remove('d-none');
+    btnText.innerText = editId ? "Updating..." : "Uploading...";
+
+    const formData = new FormData();
+    formData.append('title', document.getElementById('title').value);
+    formData.append('author', document.getElementById('author').value);
+    formData.append('price', document.getElementById('price').value);
+    formData.append('level', document.getElementById('level').value);
+    
+    // Only append image if a new one was selected
+    if (fileInput.files[0]) {
+        formData.append('image', fileInput.files[0]);
     }
 
-    // FIX FOR BACKEND ERROR
-    document.getElementById('addBookForm').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const token = localStorage.getItem('token');
-        const btn = document.getElementById('submitBtn');
-        const spinner = document.getElementById('btnSpinner');
-        const btnText = document.getElementById('btnText');
-        const fileInput = document.getElementById('image');
+    try {
+        // Switch between POST (/add) and PUT (/edit/:id)
+        const method = editId ? 'PUT' : 'POST';
+        const endpoint = editId ? `${API_URL}/edit/${editId}` : `${API_URL}/add`;
 
-        if (fileInput.files.length === 0) {
-            alert("Please select an image file.");
-            return;
+        const response = await fetch(endpoint, {
+            method: method,
+            headers: { 'Authorization': `Bearer ${token}` },
+            body: formData 
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(editId ? "✨ Book updated successfully!" : "✨ Book added successfully!");
+            window.location.href = "manage_books.html";
+        } else {
+            alert("Error: " + (data.error || "Action failed"));
         }
-
-        btn.disabled = true;
-        spinner.classList.remove('d-none');
-        btnText.innerText = "Uploading...";
-
-        const formData = new FormData();
-        formData.append('title', document.getElementById('title').value);
-        formData.append('author', document.getElementById('author').value);
-        formData.append('price', document.getElementById('price').value);
-        formData.append('level', document.getElementById('level').value);
-        
-        // FIX 2: Add here as well
-        formData.append('image', fileInput.files[0]); 
-
-        try {
-            const response = await fetch(`${API_URL}/books`, {
-                method: 'POST',
-                headers: { 
-                    'Authorization': `Bearer ${token}` 
-                },
-                body: formData 
-            });
-
-            const data = await response.json();
-
-            if (response.ok) {
-                alert("✨ Success! Book uploaded to Cloudinary.");
-                window.location.href = "dashboard.html";
-            } else {
-                console.error("Server Error:", data);
-                alert("Error: " + (data.error || "Upload failed"));
-            }
-        } catch (err) {
-            console.error("Network Error:", err);
-        } finally {
-            btn.disabled = false;
-            spinner.classList.add('d-none');
-            btnText.innerText = "Upload Book to Library";
-        }
-    });
-
-    function logout() {
-        localStorage.clear();
-        window.location.href = "../login.html";
+    } catch (err) {
+        console.error("Network Error:", err);
+        alert("Server connection failed.");
+    } finally {
+        btn.disabled = false;
+        spinner.classList.add('d-none');
+        btnText.innerText = editId ? "Update Book Details" : "Upload Book to Library";
     }
+});
+
+function logout() {
+    localStorage.clear();
+    window.location.href = "../login.html";
+}
 </script>
 
 </body>
