@@ -250,8 +250,8 @@ function checkAuthStatus() {
         }
         if(heroBtn) {
             const isAdmin = user.role === 'admin';
-            heroBtn.innerText = isAdmin ? "Admin Panel" : "Go to Dashboard";
-            heroBtn.href = isAdmin ? "admin/dashboard.html" : "dashboard.html";
+            heroBtn.innerText = isAdmin ? "Admin Panel" : "Get books";
+            heroBtn.href = isAdmin ? "admin/dashboard.html" : "books.html";
         }
     }
 }
