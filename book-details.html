@@ -164,37 +164,55 @@
         }
 
         // Handle Email Form Submission
-        document.getElementById('emailForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('userEmailInput').value;
-            const token = localStorage.getItem('token');
-            const saveBtn = document.getElementById('saveEmailBtn');
+       // Handle Email Form Submission
+document.getElementById('emailForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('userEmailInput').value;
+    const token = localStorage.getItem('token');
+    const saveBtn = document.getElementById('saveEmailBtn');
 
-            saveBtn.disabled = true;
-            saveBtn.innerText = "Saving...";
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Saving...`;
 
-            try {
-                const res = await fetch(`${API_URL}/users/update-profile`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ email })
-                });
-
-                if (res.ok) {
-                    localStorage.setItem('userEmail', email);
-                    bootstrap.Modal.getInstance(document.getElementById('emailModal')).hide();
-                    initiatePurchase(email);
-                } else {
-                    alert("Failed to update email.");
-                }
-            } catch (err) {
-                alert("Network error.");
-            } finally {
-                saveBtn.disabled = false;
-                saveBtn.innerText = "Save and Continue";
-            }
+    try {
+        const res = await fetch(`${API_URL}/users/update-profile`, {
+            method: 'PATCH',
+            headers: { 
+                'Content-Type': 'application/json', 
+                'Authorization': `Bearer ${token}` 
+            },
+            body: JSON.stringify({ email })
         });
 
+        const data = await res.json();
+
+        if (res.ok) {
+            // Update local storage so we don't ask again
+            localStorage.setItem('userEmail', email);
+            
+            // Also update the local 'user' object if it exists
+            const user = JSON.parse(localStorage.getItem('user') || '{}');
+            user.email = email;
+            localStorage.setItem('user', JSON.stringify(user));
+
+            // Hide modal and proceed to Paystack
+            const modalElement = document.getElementById('emailModal');
+            const modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+            
+            initiatePurchase(email);
+        } else {
+            // Display the specific error from your backend (e.g., "Email already in use")
+            alert(data.error || "Failed to update email.");
+        }
+    } catch (err) {
+        console.error("Update Error:", err);
+        alert("Network error. Please check your connection.");
+    } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerText = "Save and Continue";
+    }
+});
         async function initiatePurchase(email) {
             const btn = document.getElementById('buyBtn');
             const token = localStorage.getItem('token');
